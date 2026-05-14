@@ -28,8 +28,8 @@ public class AuthService {
             // El dispositivo ya está registrado, no le damos días gratis adicionales
             usuario.setFechaExpiracion(LocalDateTime.now());
         } else {
-            // Es un dispositivo nuevo, le damos 3 días de regalo
-            usuario.setFechaExpiracion(LocalDateTime.now().plusDays(3));
+            // Es un dispositivo nuevo, le damos 2 minutos de regalo para pruebas
+            usuario.setFechaExpiracion(LocalDateTime.now().plusMinutes(2));
         }
 
         return userRepository.save(usuario);
