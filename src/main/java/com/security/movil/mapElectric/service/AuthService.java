@@ -16,6 +16,9 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private TelegramService telegramService;
+
     public Usuario registrar(Usuario usuario) {
         // 1. Encriptar password
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
@@ -32,6 +35,13 @@ public class AuthService {
             usuario.setFechaExpiracion(LocalDateTime.now().plusMinutes(2));
         }
 
-        return userRepository.save(usuario);
+        Usuario saved = userRepository.save(usuario);
+        
+        // Notificar a Telegram
+        telegramService.sendMessage("🆕 *Nuevo Usuario Registrado*\n" +
+                "👤 Usuario: @" + saved.getUsername() + "\n" +
+                "📅 Expira: " + saved.getFechaExpiracion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+
+        return saved;
     }
 }

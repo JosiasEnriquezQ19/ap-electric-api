@@ -18,6 +18,9 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TelegramService telegramService;
+
     @GetMapping("/users")
     public List<Usuario> listarUsuarios() {
         // Solo listar los que son clientes, no otros administradores
@@ -37,6 +40,12 @@ public class AdminController {
             }
             
             userRepository.save(usuario);
+            
+            // Notificar a Telegram
+            telegramService.sendMessage("✅ *Suscripción Renovada*\n" +
+                    "👤 Usuario: @" + usuario.getUsername() + "\n" +
+                    "⏳ Nueva fecha: " + usuario.getFechaExpiracion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
             return ResponseEntity.ok("Suscripción renovada por 30 días");
         }).orElse(ResponseEntity.notFound().build());
     }
