@@ -62,4 +62,20 @@ public class AuthController {
 
         return ResponseEntity.status(401).body("Credenciales inválidas");
     }
+
+    @GetMapping("/status")
+    public ResponseEntity<?> getStatus(org.springframework.security.core.Authentication authentication) {
+        String username = authentication.getName();
+        return userRepository.findByUsername(username)
+                .map(user -> {
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("username", user.getUsername());
+                    response.put("fechaExpiracion", user.getFechaExpiracion());
+                    response.put("activo", user.tieneAcceso());
+                    response.put("role", user.getRole());
+                    response.put("status", user.getStatus());
+                    return ResponseEntity.ok(response);
+                })
+                .orElse(ResponseEntity.status(404).build());
+    }
 }
