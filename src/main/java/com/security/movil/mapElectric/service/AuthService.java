@@ -31,16 +31,17 @@ public class AuthService {
             // El dispositivo ya está registrado, no le damos días gratis adicionales
             usuario.setFechaExpiracion(LocalDateTime.now());
         } else {
-            // Es un dispositivo nuevo, le damos 2 minutos de regalo para pruebas
-            usuario.setFechaExpiracion(LocalDateTime.now().plusMinutes(2));
+            // Es un dispositivo nuevo, le damos 3 días de regalo
+            usuario.setFechaExpiracion(LocalDateTime.now().plusDays(3));
         }
 
         Usuario saved = userRepository.save(usuario);
-        
+
         // Notificar a Telegram
         telegramService.sendMessage("🆕 *Nuevo Usuario Registrado*\n" +
                 "👤 Usuario: @" + saved.getUsername() + "\n" +
-                "📅 Expira: " + saved.getFechaExpiracion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                "📅 Expira: "
+                + saved.getFechaExpiracion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
 
         return saved;
     }
