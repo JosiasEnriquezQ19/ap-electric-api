@@ -20,12 +20,12 @@ public class TelegramService {
         try {
             String url = "https://api.telegram.org/bot" + botToken + "/sendMessage";
             
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
-                    .queryParam("chat_id", chatId)
-                    .queryParam("text", text)
-                    .queryParam("parse_mode", "Markdown");
+            java.util.Map<String, String> body = new java.util.HashMap<>();
+            body.put("chat_id", chatId);
+            body.put("text", text);
+            body.put("parse_mode", "Markdown");
 
-            restTemplate.getForObject(builder.toUriString(), String.class);
+            restTemplate.postForObject(url, body, String.class);
         } catch (Exception e) {
             System.err.println("Error al enviar mensaje a Telegram: " + e.getMessage());
         }
