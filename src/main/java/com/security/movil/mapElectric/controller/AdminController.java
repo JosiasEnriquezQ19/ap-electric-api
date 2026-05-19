@@ -22,6 +22,28 @@ public class AdminController {
     @Autowired
     private TelegramService telegramService;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
+    @PutMapping("/users/{id}/password")
+    public ResponseEntity<?> cambiarPassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> request) {
+        String newPassword = request.get("password");
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("La contraseña no puede estar vacía");
+        }
+        return userRepository.findById(id).map(usuario -> {
+            usuario.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(usuario);
+            
+            // Opcional: Notificar a Telegram
+            telegramService.sendMessage("🔑 *Contraseña Restablecida*\n" +
+                    "👤 Usuario: @" + usuario.getUsername() + "\n" +
+                    "🛠️ Acción realizada por el Administrador");
+
+            return ResponseEntity.ok("Contraseña actualizada con éxito");
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/users")
     public List<Usuario> listarUsuarios() {
         // Solo listar los que son clientes, no otros administradores
