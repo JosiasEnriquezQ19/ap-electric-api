@@ -25,14 +25,14 @@ public class AuthService {
         usuario.setFechaRegistro(LocalDateTime.now());
         usuario.setRole(Usuario.Role.ROLE_USER);
 
-        // 2. Lógica de los 3 días de prueba (Trial)
+        // 2. Lógica de 1 día de prueba (Trial)
         // Verificamos si el dispositivo ya usó la prueba gratis
         if (usuario.getDeviceId() != null && userRepository.existsByDeviceId(usuario.getDeviceId())) {
             // El dispositivo ya está registrado, no le damos días gratis adicionales
             usuario.setFechaExpiracion(LocalDateTime.now());
         } else {
-            // Es un dispositivo nuevo, le damos 3 días de regalo
-            usuario.setFechaExpiracion(LocalDateTime.now().plusDays(3));
+            // Es un dispositivo nuevo, le damos 1 día de regalo
+            usuario.setFechaExpiracion(LocalDateTime.now().plusDays(1));
         }
 
         Usuario saved = userRepository.save(usuario);

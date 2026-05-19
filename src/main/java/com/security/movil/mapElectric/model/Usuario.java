@@ -46,15 +46,18 @@ public class Usuario {
 
     // Campo dinámico para el frontend (React)
     public String getStatus() {
-        if (fechaExpiracion == null) return "EXPIRED";
-        if (LocalDateTime.now().isAfter(fechaExpiracion)) return "EXPIRED";
-        
-        // Si se registró hace menos de 3 días y la expiración es corta, es TRIAL
-        if (fechaRegistro != null && fechaRegistro.plusDays(3).isAfter(LocalDateTime.now()) 
-            && fechaExpiracion.isBefore(fechaRegistro.plusDays(4))) {
+        if (fechaExpiracion == null)
+            return "EXPIRED";
+        if (LocalDateTime.now().isAfter(fechaExpiracion))
+            return "EXPIRED";
+
+        // Es TRIAL si su fecha de expiración original fue configurada a corto plazo (1
+        // a 3 días)
+        // Esto mantiene compatibles a los usuarios antiguos que tenían 3 días.
+        if (fechaRegistro != null && fechaExpiracion.isBefore(fechaRegistro.plusDays(4))) {
             return "TRIAL";
         }
-        
+
         return "ACTIVE";
     }
 }
