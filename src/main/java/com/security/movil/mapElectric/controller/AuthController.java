@@ -42,35 +42,10 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String password = request.get("password");
-        String deviceId = request.get("deviceId");
-
         Optional<Usuario> userOpt = userRepository.findByUsername(username);
 
         if (userOpt.isPresent() && passwordEncoder.matches(password, userOpt.get().getPassword())) {
             Usuario user = userOpt.get();
-
-            // Si NO es administrador, aplicamos las reglas de dispositivo móvil
-            if (user.getRole() != Usuario.Role.ROLE_ADMIN) {
-                // Forzar actualización: rechazar logins que no envíen deviceId (versión
-                // antigua)
-                if (deviceId == null || deviceId.trim().isEmpty()) {
-                    return ResponseEntity.status(426)
-                            .body("Actualización requerida. Por favor descarga la nueva versión de la app.");
-                }
-
-                // Verificar si el dispositivo coincide con el registrado
-                if (user.getDeviceId() != null && !user.getDeviceId().equals(deviceId)) {
-                    return ResponseEntity.status(403)
-                            .body("Esta cuenta ya está vinculada a otro dispositivo. Contacta con soporte.");
-                }
-
-                // Si es una cuenta antigua sin deviceId, vincular al primer dispositivo que
-                // inicie sesión
-                if (user.getDeviceId() == null) {
-                    user.setDeviceId(deviceId);
-                    userRepository.save(user);
-                }
-            }
 
             String token = jwtUtils.generateToken(username);
 
